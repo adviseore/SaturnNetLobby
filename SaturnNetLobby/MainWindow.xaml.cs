@@ -11,18 +11,19 @@ namespace SaturnNetLobby
         public MainWindow()
         {
             InitializeComponent();
-
-            BrowseMednafenButton.Click += BrowseMednafenButton_Click;
-            BrowseGameButton.Click += BrowseGameButton_Click;
-            LaunchButton.Click += LaunchButton_Click;
         }
 
-        private void BrowseMednafenButton_Click(object sender, RoutedEventArgs e)
+        private void BrowseMednafenButton_Click(
+            object sender,
+            RoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-
-            dialog.Title = "Select Mednafen";
-            dialog.Filter = "Mednafen (mednafen.exe)|mednafen.exe|Executable files (*.exe)|*.exe";
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Title = "Select Mednafen",
+                Filter =
+                    "Mednafen (mednafen.exe)|mednafen.exe|" +
+                    "Executable files (*.exe)|*.exe"
+            };
 
             if (dialog.ShowDialog() == true)
             {
@@ -31,14 +32,18 @@ namespace SaturnNetLobby
             }
         }
 
-        private void BrowseGameButton_Click(object sender, RoutedEventArgs e)
+        private void BrowseGameButton_Click(
+            object sender,
+            RoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-
-            dialog.Title = "Select Saturn Game";
-            dialog.Filter =
-                "Saturn Games (*.cue;*.ccd;*.toc;*.m3u)|*.cue;*.ccd;*.toc;*.m3u|" +
-                "All files (*.*)|*.*";
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Title = "Select Saturn Game",
+                Filter =
+                    "Saturn Games (*.cue;*.ccd;*.toc;*.m3u)|" +
+                    "*.cue;*.ccd;*.toc;*.m3u|" +
+                    "All files (*.*)|*.*"
+            };
 
             if (dialog.ShowDialog() == true)
             {
@@ -47,10 +52,12 @@ namespace SaturnNetLobby
             }
         }
 
-        private void LaunchButton_Click(object sender, RoutedEventArgs e)
+        private bool ValidatePaths(
+            out string mednafenPath,
+            out string gamePath)
         {
-            string mednafenPath = MednafenPathBox.Text.Trim();
-            string gamePath = GamePathBox.Text.Trim();
+            mednafenPath = MednafenPathBox.Text.Trim();
+            gamePath = GamePathBox.Text.Trim();
 
             if (!File.Exists(mednafenPath))
             {
@@ -60,7 +67,7 @@ namespace SaturnNetLobby
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                return;
+                return false;
             }
 
             if (!File.Exists(gamePath))
@@ -71,33 +78,157 @@ namespace SaturnNetLobby
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
+                return false;
+            }
+
+            return true;
+        }
+
+        private void LaunchButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            if (!ValidatePaths(
+                out string mednafenPath,
+                out string gamePath))
+            {
                 return;
             }
 
             try
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo
-                {
-                    FileName = mednafenPath,
-                    WorkingDirectory = Path.GetDirectoryName(mednafenPath)!
-                };
+                ProcessStartInfo startInfo =
+                    new ProcessStartInfo
+                    {
+                        FileName = mednafenPath,
+                        WorkingDirectory =
+                            Path.GetDirectoryName(mednafenPath)!
+                    };
 
                 startInfo.ArgumentList.Add(gamePath);
 
                 Process.Start(startInfo);
 
-                StatusText.Text = "Status: Saturn launched!";
+                StatusText.Text =
+                    "Status: Saturn launched offline!";
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"Could not launch Mednafen:\n\n{ex.Message}",
-                    "Launch Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-
-                StatusText.Text = "Status: Launch failed";
+                ShowLaunchError(ex);
             }
+        }
+
+        private void ConnectButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            if (!ValidatePaths(
+                out string mednafenPath,
+                out string gamePath))
+            {
+                return;
+            }
+
+            string nickname = NicknameBox.Text.Trim();
+            string server = ServerBox.Text.Trim();
+            string portText = PortBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(nickname))
+            {
+                MessageBox.Show(
+                    "Please enter a nickname.",
+                    "Nickname Required",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(server))
+            {
+                MessageBox.Show(
+                    "Please enter a netplay server.",
+                    "Server Required",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (!int.TryParse(portText, out int port) ||
+                port < 1 ||
+                port > 65535)
+            {
+                MessageBox.Show(
+                    "Please enter a valid port between 1 and 65535.",
+                    "Invalid Port",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            try
+            {
+                StatusText.Text =
+                    $"Status: Launching netplay to {server}:{port}...";
+
+                ProcessStartInfo startInfo =
+                    new ProcessStartInfo
+                    {
+                        FileName = mednafenPath,
+                        WorkingDirectory =
+                            Path.GetDirectoryName(mednafenPath)!
+                    };
+
+                startInfo.ArgumentList.Add("-netplay.host");
+                startInfo.ArgumentList.Add(server);
+
+                startInfo.ArgumentList.Add("-netplay.port");
+                startInfo.ArgumentList.Add(port.ToString());
+
+                startInfo.ArgumentList.Add("-netplay.nick");
+                startInfo.ArgumentList.Add(nickname);
+
+                startInfo.ArgumentList.Add("-connect");
+
+                startInfo.ArgumentList.Add(gamePath);
+
+                Process process = Process.Start(startInfo);
+
+                if (process == null)
+                {
+                    MessageBox.Show(
+                        "Windows could not start Mednafen.",
+                        "Launch Failed",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    StatusText.Text =
+                        "Status: Mednafen did not start";
+
+                    return;
+                }
+
+                StatusText.Text =
+                    $"Status: Netplay launched - {server}:{port}";
+            }
+            catch (Exception ex)
+            {
+                ShowLaunchError(ex);
+            }
+        }
+
+        private void ShowLaunchError(Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not launch Mednafen:\n\n{ex.Message}",
+                "Launch Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            StatusText.Text =
+                "Status: Launch failed";
         }
     }
 }

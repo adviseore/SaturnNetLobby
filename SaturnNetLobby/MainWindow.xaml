@@ -2,91 +2,160 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Saturn NetLobby"
-        Height="400"
-        Width="700"
+        Height="650"
+        Width="760"
         WindowStartupLocation="CenterScreen">
 
-    <Grid Margin="30">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="30">
 
-        <!-- Title -->
-        <TextBlock Grid.Row="0"
-                   Text="SATURN NETLOBBY"
-                   FontSize="28"
-                   FontWeight="Bold"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Mednafen label -->
-        <TextBlock Grid.Row="2"
-                   Text="Mednafen"
-                   FontWeight="Bold"/>
+            <!-- TITLE -->
+            <TextBlock Grid.Row="0"
+                       Text="SATURN NETLOBBY"
+                       FontSize="28"
+                       FontWeight="Bold"/>
 
-        <!-- Mednafen selection -->
-        <Grid Grid.Row="3" Margin="0,5,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="100"/>
-            </Grid.ColumnDefinitions>
+            <!-- MEDNAFEN -->
+            <TextBlock Grid.Row="2"
+                       Text="Mednafen"
+                       FontWeight="Bold"/>
 
-            <TextBox x:Name="MednafenPathBox"
-                     Grid.Column="0"
-                     Height="30"
-                     VerticalContentAlignment="Center"/>
+            <Grid Grid.Row="3"
+                  Margin="0,5,0,0">
 
-            <Button x:Name="BrowseMednafenButton"
-                    Grid.Column="1"
-                    Content="Browse..."
-                    Margin="10,0,0,0"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="MednafenPathBox"
+                         Grid.Column="0"
+                         Height="30"
+                         VerticalContentAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Content="Browse..."
+                        Margin="10,0,0,0"
+                        Click="BrowseMednafenButton_Click"/>
+            </Grid>
+
+            <!-- SATURN GAME -->
+            <TextBlock Grid.Row="5"
+                       Text="Saturn Game"
+                       FontWeight="Bold"/>
+
+            <Grid Grid.Row="6"
+                  Margin="0,5,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="GamePathBox"
+                         Grid.Column="0"
+                         Height="30"
+                         VerticalContentAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Content="Browse..."
+                        Margin="10,0,0,0"
+                        Click="BrowseGameButton_Click"/>
+            </Grid>
+
+            <!-- NETPLAY -->
+            <TextBlock Grid.Row="8"
+                       Text="NETPLAY"
+                       FontSize="20"
+                       FontWeight="Bold"/>
+
+            <!-- NICKNAME -->
+            <StackPanel Grid.Row="9"
+                        Margin="0,10,0,0">
+
+                <TextBlock Text="Nickname"
+                           FontWeight="Bold"/>
+
+                <TextBox x:Name="NicknameBox"
+                         Height="30"
+                         Margin="0,5,0,0"
+                         Text="Trevor"
+                         VerticalContentAlignment="Center"/>
+            </StackPanel>
+
+            <!-- SERVER -->
+            <StackPanel Grid.Row="10"
+                        Margin="0,15,0,0">
+
+                <TextBlock Text="Server"
+                           FontWeight="Bold"/>
+
+                <TextBox x:Name="ServerBox"
+                         Height="30"
+                         Margin="0,5,0,0"
+                         Text="mednafen-us.emuparadise.org"
+                         VerticalContentAlignment="Center"/>
+            </StackPanel>
+
+            <!-- PORT -->
+            <StackPanel Grid.Row="11"
+                        Margin="0,15,0,0">
+
+                <TextBlock Text="Port"
+                           FontWeight="Bold"/>
+
+                <TextBox x:Name="PortBox"
+                         Width="100"
+                         Height="30"
+                         Margin="0,5,0,0"
+                         HorizontalAlignment="Left"
+                         Text="4046"
+                         VerticalContentAlignment="Center"/>
+            </StackPanel>
+
+            <!-- BUTTONS -->
+            <StackPanel Grid.Row="13"
+                        Orientation="Horizontal">
+
+                <Button Content="LAUNCH OFFLINE"
+                        Width="180"
+                        Height="45"
+                        FontWeight="Bold"
+                        Click="LaunchButton_Click"/>
+
+                <Button Content="CONNECT &amp; PLAY"
+                        Width="180"
+                        Height="45"
+                        Margin="15,0,0,0"
+                        FontWeight="Bold"
+                        Click="ConnectButton_Click"/>
+            </StackPanel>
+
+            <!-- STATUS -->
+            <TextBlock x:Name="StatusText"
+                       Grid.Row="15"
+                       Text="Status: Ready"
+                       FontSize="14"/>
+
         </Grid>
-
-        <!-- Game label -->
-        <TextBlock Grid.Row="5"
-                   Text="Saturn Game"
-                   FontWeight="Bold"/>
-
-        <!-- Game selection -->
-        <Grid Grid.Row="6" Margin="0,5,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="100"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBox x:Name="GamePathBox"
-                     Grid.Column="0"
-                     Height="30"
-                     VerticalContentAlignment="Center"/>
-
-            <Button x:Name="BrowseGameButton"
-                    Grid.Column="1"
-                    Content="Browse..."
-                    Margin="10,0,0,0"/>
-        </Grid>
-
-        <!-- Launch -->
-        <Button x:Name="LaunchButton"
-                Grid.Row="8"
-                Content="LAUNCH SATURN"
-                Width="180"
-                Height="45"
-                HorizontalAlignment="Left"
-                FontWeight="Bold"/>
-
-        <!-- Status -->
-        <TextBlock x:Name="StatusText"
-                   Grid.Row="10"
-                   Text="Status: Ready"
-                   FontSize="14"/>
-
-    </Grid>
+    </ScrollViewer>
 </Window>
